@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./css/resset.css">
+  <title>Little Star Piano</title>
+  <style>
+    body {
+      width: 100vw;
+      height: 100vh;
+      font-family: '微軟正黑體';
+      color: white;
+    }
+
+    .container {
+      width: 100vw;
+      height: 100vh;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    h1 {
+      position: absolute;
+      font-size: 40px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 1), 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.5);
+      top: 100px;
+    }
+
+    .bg {
+      height: 100vh;
+    }
+
+    .piano {
+      width: 600px;
+      position: absolute;
+      opacity: 0.8;
+    }
+
+    #game {
+      position: absolute;
+      /* cursor: url(檔案路徑) 滑鼠x座標 滑鼠y座標 , auto*/
+      cursor: url(./images/hand.png) 50 50, auto;
+    }
+
+    #record {
+      position: absolute;
+      bottom: 20px;
+      text-align: center;
+    }
+
+    #record input {
+      width: 200px;
+      height: 35px;
+      border-radius: 5px;
+      background: rgba(50, 0, 255, 0.3);
+      color: white;
+      font-size: 20px;
+      text-shadow: 0 0 10px rgba(50, 0, 255, 1), 0 0 20px rgba(50, 0, 255, 0.8);
+    }
+
+    #record input:disabled {
+      background: rgba(0, 0, 25, 0.3);
+      color: rgb(200, 200, 200);
+    }
+
+    #record p {
+      font-size: 18px;
+      text-shadow: 0 0 10px rgba(50, 0, 255, 1), 0 0 20px rgba(50, 0, 255, 0.8);
+      margin-top: 15px;
+    }
+
+
+    .keyboard {
+      width: 85px;
+      height: 600px;
+    }
+
+    .light {
+      background: rgba(50, 0, 255, 0.3);
+      box-shadow: 0 0 15px rgba(50, 0, 255, 1);
+    }
+
+    .dark {
+      background: rgba(50, 65, 125, 0.3);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 1);
+    }
+
+    .wrong {
+      background: rgba(255, 0, 0, 0.3);
+      box-shadow: 0 0 15px rgba(255, 0, 0, 1);
+    }
+
+    .blackKeyboard {
+      width: 55px;
+      height: 400px;
+      background-color: rgba(50, 0, 125, 0.5);
+      position: absolute;
+      top: 184px;
+    }
+
+    #black1 {
+      left: 706px;
+    }
+
+    #black2 {
+      left: 810px;
+    }
+
+    #black3 {
+      left: 964px;
+    }
+
+    #black4 {
+      left: 1063px;
+    }
+
+    #black5 {
+      left: 1161px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <img class="bg" src="./images/star_sky.jpg">
+    <h1 id="text">★ Piano Game ★</h1>
+    <img class="piano" src="./images/piano_keyboard.jpg">
+    <table id="game">
+      <tr>
+        <td class="keyboard" id="keyboard1"></td>
+        <td class="keyboard" id="keyboard2"></td>
+        <td class="keyboard" id="keyboard3"></td>
+        <td class="keyboard" id="keyboard4"></td>
+        <td class="keyboard" id="keyboard5"></td>
+        <td class="keyboard" id="keyboard6"></td>
+        <td class="keyboard" id="keyboard7"></td>
+      </tr>
+    </table>
+
+    <div class="blackKeyboard" id="black1"></div>
+    <div class="blackKeyboard" id="black2"></div>
+    <div class="blackKeyboard" id="black3"></div>
+    <div class="blackKeyboard" id="black4"></div>
+    <div class="blackKeyboard" id="black5"></div>
+
+    <div id="record">
+      <input type="button" value="★ 開始隨機彈奏 ★" id="start">
+      <input type="button" value="★ 彈奏小星星 ★" id="play">
+      <br>
+      <p>★ 目前分數：<span id="score">0</span></p>
+      <hr>
+      <p>★ 最高分 ★<br>
+        玩家：<span id="highname">???</span><br>
+        分數：<span id="highscore">0</span></p>
+    </div>
+  </div>
+
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    const text = document.getElementById('text')
+    const keyboards = document.getElementsByClassName('keyboard')
+    const start = document.getElementById('start')
+    const play = document.getElementById('play')
+    const scoreText = document.getElementById('score')
+    const highnameText = document.getElementById('highname')
+    const highscoreText = document.getElementById('highscore')
+    const do1 = document.getElementById('keyboard1')
+    const re2 = document.getElementById('keyboard2')
+    const mi3 = document.getElementById('keyboard3')
+    const fa4 = document.getElementById('keyboard4')
+    const so5 = document.getElementById('keyboard5')
+    const ra6 = document.getElementById('keyboard6')
+    const si7 = document.getElementById('keyboard7')
+
+    // 小星星簡譜
+    const sheetMusic = [1, 1, 5, 5, 6, 6, 5, 4, 4, 3, 3, 2, 2, 1, 5, 5, 4, 4, 3, 3, 2, 5, 5, 4, 4, 3, 3, 2, 1, 1, 5, 5, 6, 6, 5, 4, 4, 3, 3, 2, 2, 1]
+    let num = 0
+
+    // 最高分
+    const high = { score: 0, name: '???' }
+    // 計分
+    let score = 0
+    // 計時器
+    let timer = 0
+    // 音效
+    const audio = new Audio()
+
+    const storage = JSON.parse(localStorage.getItem('playing'))
+    // 如果有資料
+    if (storage) {
+      high.name = storage.name
+      high.score = storage.score
+      // 修改最高分顯示文字
+      highnameText.innerText = high.name
+      highscoreText.innerText = high.score
+    }
+
+    // 隨機彈奏開始按鈕
+    start.onclick = () => {
+      // 停用開始按鈕
+      start.disabled = true
+      play.disabled = true
+      // 重設分數
+      score = 0
+      scoreText.innerText = score
+      // 每秒變換一次
+      timer = setInterval(game, 1000)
+      game()
+      // 十秒後遊戲結束
+      setTimeout(end, 30 * 1000)
+    }
+
+    // 彈奏小星星的開始按鈕
+    play.onclick = () => {
+      // 停用開始按鈕
+      play.disabled = true
+      start.disabled = true
+      // 重設分數
+      score = 0
+      scoreText.innerText = score
+      // 每拍變換一次
+      timer = setInterval(piano, 800)
+      piano()
+      // 演奏完所有音符後結束
+      setTimeout(end, 42 * 800)
+    }
+
+    // 小星星每拍變換顏色
+    const piano = () => {
+      for (const keyboard of keyboards) {
+        keyboard.classList.remove('light')
+        keyboard.classList.remove('dark')
+      }
+      // 按照樂譜順序發光提示
+      console.log(sheetMusic[num])
+      keyboards[sheetMusic[num] - 1].classList.add('light')
+      num++
+    }
+
+    // 每秒隨機變換顏色
+    const game = () => {
+      for (const keyboard of keyboards) {
+        keyboard.classList.remove('light')
+        keyboard.classList.remove('dark')
+      }
+      // 隨機抽三顆鍵發光，不考慮重複
+      for (let i = 0; i < 3; i++) {
+        keyboards[Math.round(Math.random() * (keyboards.length - 1))].classList.add('light')
+      }
+    }
+
+    // 遊戲結束
+    const end = () => {
+      // 停止變換顏色
+      clearInterval(timer)
+
+      // 把顏色清掉
+      for (const keyboard of keyboards) {
+        keyboard.classList.remove('light')
+        keyboard.classList.remove('dark')
+        keyboard.classList.remove('wrong')
+      }
+
+      // 顯示遊戲結束
+      text.innerText = 'Game Over'
+      // 啟用隨機彈奏開始按鈕
+      start.disabled = false
+      // keyboards.disabled = true
+
+      // 樂譜重新開始
+      num = 0
+      // 啟用彈奏小星星開始按鈕
+      play.disabled = false
+
+      // 跳出訊息
+      Swal.fire({
+        icon: 'success',
+        title: '演奏結束',
+        text: `您得到 ${score} 分`
+      })
+      // 紀錄最高分
+      if (score > high.score) {
+        // audio.src = './yay.mp3'
+        // audio.play()
+
+        // 請玩家輸入名字
+        const input = prompt('恭喜您獲得最高分，請輸入名字')
+
+        // 修改最高分資料
+        high.score = score
+        high.name = input || '???'
+        // 修改最高分顯示文字
+        highnameText.innerText = high.name
+        highscoreText.innerText = high.score
+        // 保存
+        // localStorage.setItem(資料名, 文字)
+        // 變數轉文字:JSON.stringify(變數)
+        localStorage.setItem('playing', JSON.stringify(high))
+      }
+    }
+
+    // 點擊變色
+    for (const keyboard of keyboards) {
+      // 加每個鍵的音效
+      keyboard.onclick = () => {
+        if (keyboard == do1) {
+          audio.src = `./音效/1.mp3`
+          audio.play()
+        } else if (keyboard == re2) {
+          audio.src = `./音效/2.mp3`
+          audio.play()
+        } else if (keyboard == mi3) {
+          audio.src = `./音效/3.mp3`
+          audio.play()
+        } else if (keyboard == fa4) {
+          audio.src = `./音效/4.mp3`
+          audio.play()
+        } else if (keyboard == so5) {
+          audio.src = `./音效/5.mp3`
+          audio.play()
+        } else if (keyboard == ra6) {
+          audio.src = `./音效/6.mp3`
+          audio.play()
+        } else if (keyboard == si7) {
+          audio.src = `./音效/7.mp3`
+          audio.play()
+        }
+
+        if (keyboard.classList.contains('light')) {
+          // 變暗
+          keyboard.classList.replace('light', 'dark')
+          // 顯示 good
+          text.innerText = '★Good★'
+          // 加分
+          score++
+          scoreText.innerText = score
+          // 按錯鍵的話
+        } else if (start.disabled === true || play.disabled === true && !(keyboard.classList.contains('light'))) {
+          // 變紅色
+          keyboard.classList.add('wrong')
+          let mistake = setTimeout(() => {
+            keyboard.classList.remove('wrong')
+          }, 400)
+          // 顯示 miss
+          text.innerText = '✖Miss✖'
+          // 扣分
+          score--
+          scoreText.innerText = score
+        }
+      }
+    }
+
+    // 使用這種方法加音效會蓋掉之前的 onclick
+    // for (const i in keyboards) {
+    //   keyboards[i].onclick = () => {
+    //     audio.src = `./音效/${i - 1 + 2}.mp3`
+    //     audio.play()
+    //   }
+    // }
+
+    // 數字鍵
+    document.onkeydown = event => {
+      // 按了什麼鍵
+      const key = event.key
+      // 如果是數字鍵
+      if (!isNaN(key)) {
+        // 找到對應的格子
+        const target = document.getElementById(`keyboard${key}`)
+        // 每個鍵的音效
+        if (target == do1) {
+          audio.src = `./音效/1.mp3`
+          audio.play()
+        } else if (target == re2) {
+          audio.src = `./音效/2.mp3`
+          audio.play()
+        } else if (target == mi3) {
+          audio.src = `./音效/3.mp3`
+          audio.play()
+        } else if (target == fa4) {
+          audio.src = `./音效/4.mp3`
+          audio.play()
+        } else if (target == so5) {
+          audio.src = `./音效/5.mp3`
+          audio.play()
+        } else if (target == ra6) {
+          audio.src = `./音效/6.mp3`
+          audio.play()
+        } else if (target == si7) {
+          audio.src = `./音效/7.mp3`
+          audio.play()
+        }
+
+        // 如果有找到
+        if (target && target.classList.contains('light')) {
+          // 變暗
+          target.classList.replace('light', 'dark')
+          // 顯示 good
+          text.innerText = 'Good！'
+          // 加分
+          score++
+          scoreText.innerText = score
+          // 如果按錯鍵的話
+        } else if (start.disabled === true || play.disabled === true && target && !(target.classList.contains('light'))) {
+          // 變紅色
+          target.classList.add('wrong')
+          let mistake = setTimeout(() => {
+            target.classList.remove('wrong')
+          }, 400)
+          // 顯示 miss
+          text.innerText = 'Miss'
+          // 扣分
+          score--
+          scoreText.innerText = score
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>
