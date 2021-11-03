@@ -29,8 +29,15 @@
     h1 {
       position: absolute;
       font-size: 40px;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 1), 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.5);
+      text-shadow: 0 0 10px rgba(255, 255, 255, 1);
       top: 100px;
+      animation: flash 1.5s linear infinite;
+    }
+
+    @keyframes flash {
+      50% {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 1), 0 0 20px rgba(255, 255, 255, 0.8), 0 0 50px rgba(255, 255, 255, 0.5);
+      }
     }
 
     .bg {
@@ -46,7 +53,7 @@
     #game {
       position: absolute;
       /* cursor: url(檔案路徑) 滑鼠x座標 滑鼠y座標 , auto*/
-      cursor: url(./images/hand.png) 50 50, auto;
+      cursor: url(./images/hand.png) 35 10, auto;
     }
 
     #record {
@@ -124,6 +131,25 @@
     #black5 {
       left: 1161px;
     }
+
+    .star {
+      color: white;
+      font-size: 3rem;
+      animation: flash 1.5s linear infinite;
+      position: absolute;
+    }
+
+    .big {
+      font-size: 5rem;
+    }
+
+    .small {
+      font-size: 2rem;
+    }
+
+    .slow {
+      animation: flash 3s linear infinite;
+    }
   </style>
 </head>
 
@@ -160,6 +186,28 @@
         玩家：<span id="highname">???</span><br>
         分數：<span id="highscore">0</span></p>
     </div>
+
+    <!-- 左側的星星 -->
+    <div class="star big" style="top: 10%; left: 10%; transform: rotate(-20deg);">★</div>
+    <div class="star" style="top: 25%; left: 25%; transform: rotate(10deg);">★</div>
+    <div class="star small" style="top: 30%; left: 20%; transform: rotate(-10deg);">★</div>
+    <div class="star big slow" style="top: 70%; left: 5%; transform: rotate(30deg);">★</div>
+    <div class="star small" style="top: 87%; left: 35%; transform: rotate(10deg);">★</div>
+    <div class="star small" style="top: 60%; left: 30%; transform: rotate(-5deg);">★</div>
+    <div class="star small" style="top: 68%; left: 10%; transform: rotate(15deg);">★</div>
+    <div class="star slow" style="top: 50%; left: 15%; transform: rotate(10deg);">★</div>
+    <div class="star small slow" style="top: 92%; left: 20%; transform: rotate(-10deg);">★</div>
+
+    <!-- 右側的星星 -->
+    <div class="star big" style="bottom: 10%; right: 10%; transform: rotate(20deg);">★</div>
+    <div class="star" style="bottom: 25%; right: 25%; transform: rotate(-10deg);">★</div>
+    <div class="star small" style="bottom: 30%; right: 20%; transform: rotate(10deg);">★</div>
+    <div class="star big slow" style="bottom: 70%; right: 5%; transform: rotate(30deg);">★</div>
+    <div class="star small" style="bottom: 87%; right: 35%; transform: rotate(-10deg);">★</div>
+    <div class="star small" style="bottom: 60%; right: 30%; transform: rotate(5deg);">★</div>
+    <div class="star small" style="bottom: 68%; right: 10%; transform: rotate(-15deg);">★</div>
+    <div class="star slow" style="bottom: 50%; right: 15%; transform: rotate(-10deg);">★</div>
+    <div class="star small slow" style="bottom: 92%; right: 20%; transform: rotate(10deg);">★</div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -213,7 +261,7 @@
       // 每秒變換一次
       timer = setInterval(game, 1000)
       game()
-      // 十秒後遊戲結束
+      // 30秒後遊戲結束
       setTimeout(end, 30 * 1000)
     }
 
@@ -281,17 +329,23 @@
 
       // 跳出訊息
       Swal.fire({
-        icon: 'success',
         title: '演奏結束',
-        text: `您得到 ${score} 分`
+        text: `您得到 ${score} 分`,
+        imageUrl: './images/gassyou_onpu.png',
+        imageWidth: 300,
+        imageAlt: 'Custom image',
       })
       // 紀錄最高分
       if (score > high.score) {
-        // audio.src = './yay.mp3'
-        // audio.play()
-
         // 請玩家輸入名字
         const input = prompt('恭喜您獲得最高分，請輸入名字')
+
+        // Swal.fire({
+        //   title: '恭喜您獲得最高分',
+        //   input: 'text',
+        //   inputLabel: '您的名字',
+        //   inputPlaceholder: '請輸入名字'
+        // })
 
         // 修改最高分資料
         high.score = score
